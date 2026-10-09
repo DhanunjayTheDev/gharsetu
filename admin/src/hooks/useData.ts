@@ -29,14 +29,14 @@ export function useOffers(params: Record<string, any> = {}) {
 
   return useQuery({
     queryKey: ['offers', params],
-    queryFn: async () => (await api.get(`/buy-sell?${search}`)).data,
+    queryFn: async () => (await api.get(`/offers?${search}`)).data,
   });
 }
 
 export function useCreateOffer() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => (await api.post('/buy-sell', data)).data,
+    mutationFn: async (data: any) => (await api.post('/offers', data)).data,
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['offers'] }); toast.success('Offer submitted!'); },
     onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
   });
@@ -131,14 +131,14 @@ export function useSchedules(params: Record<string, any> = {}) {
 
   return useQuery({
     queryKey: ['schedules', params],
-    queryFn: async () => (await api.get(`/scheduling?${search}`)).data,
+    queryFn: async () => (await api.get(`/schedules?${search}`)).data,
   });
 }
 
 export function useCreateSchedule() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => (await api.post('/scheduling', data)).data,
+    mutationFn: async (data: any) => (await api.post('/schedules', data)).data,
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['schedules'] }); toast.success('Scheduled!'); },
     onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
   });
@@ -205,6 +205,126 @@ export function usePropertyManagement(params: Record<string, any> = {}) {
 
   return useQuery({
     queryKey: ['prop-management', params],
-    queryFn: async () => (await api.get(`/property-management?${search}`)).data,
+    queryFn: async () => (await api.get(`/property-management/my?${search}`)).data,
+  });
+}
+
+export function useCreatePropertyManagement() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: any) => (await api.post('/property-management', data)).data,
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['prop-management'] }); toast.success('Contract created!'); },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
+
+// --- Documents ---
+export function useDocuments(params: Record<string, any> = {}) {
+  const search = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => { if (v) search.append(k, String(v)); });
+
+  return useQuery({
+    queryKey: ['documents', params],
+    queryFn: async () => (await api.get(`/documents?${search}`)).data,
+  });
+}
+
+export function useUploadDocument() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: FormData) => (await api.post('/documents', data, { headers: { 'Content-Type': 'multipart/form-data' } })).data,
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['documents'] }); toast.success('Document uploaded!'); },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
+
+export function useDeleteDocument() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => (await api.delete(`/documents/${id}`)).data,
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['documents'] }); toast.success('Document deleted!'); },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
+
+// --- Users (Admin) ---
+export function useUsers(params: Record<string, any> = {}) {
+  const search = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => { if (v) search.append(k, String(v)); });
+
+  return useQuery({
+    queryKey: ['users', params],
+    queryFn: async () => (await api.get(`/users?${search}`)).data,
+  });
+}
+
+export function useUpdateUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => (await api.patch(`/users/${id}`, data)).data,
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['users'] }); toast.success('User updated!'); },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
+
+// --- Create Joint Venture ---
+export function useCreateJointVenture() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: any) => (await api.post('/joint-ventures', data)).data,
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['jv'] }); toast.success('Joint venture created!'); },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
+
+// --- Create Campaign ---
+export function useCreateCampaign() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: any) => (await api.post('/marketing', data)).data,
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['campaigns'] }); toast.success('Campaign created!'); },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
+
+// --- Mark All Notifications Read ---
+export function useMarkAllRead() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async () => (await api.patch('/notifications/read-all')).data,
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['notifications'] }); },
+  });
+}
+
+// --- Profile ---
+export function useProfile() {
+  return useQuery({
+    queryKey: ['profile'],
+    queryFn: async () => (await api.get('/auth/profile')).data,
+  });
+}
+
+export function useUpdateProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: any) => (await api.put('/auth/profile', data)).data,
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['profile'] }); toast.success('Profile updated!'); },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: async (data: any) => (await api.post('/auth/change-password', data)).data,
+    onSuccess: () => { toast.success('Password changed!'); },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
+
+// --- Pending Approvals (Admin) ---
+export function usePendingApprovals() {
+  return useQuery({
+    queryKey: ['admin', 'approvals'],
+    queryFn: async () => (await api.get('/admin/pending-approvals')).data,
   });
 }

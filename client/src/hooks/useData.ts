@@ -29,14 +29,14 @@ export function useOffers(params: Record<string, any> = {}) {
 
   return useQuery({
     queryKey: ['offers', params],
-    queryFn: async () => (await api.get(`/buy-sell?${search}`)).data,
+    queryFn: async () => (await api.get(`/offers?${search}`)).data,
   });
 }
 
 export function useCreateOffer() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => (await api.post('/buy-sell', data)).data,
+    mutationFn: async (data: any) => (await api.post('/offers', data)).data,
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['offers'] }); toast.success('Offer submitted!'); },
     onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
   });
@@ -131,14 +131,14 @@ export function useSchedules(params: Record<string, any> = {}) {
 
   return useQuery({
     queryKey: ['schedules', params],
-    queryFn: async () => (await api.get(`/scheduling?${search}`)).data,
+    queryFn: async () => (await api.get(`/schedules?${search}`)).data,
   });
 }
 
 export function useCreateSchedule() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => (await api.post('/scheduling', data)).data,
+    mutationFn: async (data: any) => (await api.post('/schedules', data)).data,
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['schedules'] }); toast.success('Scheduled!'); },
     onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
   });

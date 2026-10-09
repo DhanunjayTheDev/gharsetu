@@ -50,7 +50,7 @@ if (!fs.existsSync(logsDir)) {
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: config.clientUrl,
+  origin: [config.clientUrl, config.adminUrl],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
